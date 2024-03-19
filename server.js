@@ -32,6 +32,13 @@ const paymentRoute = require("./src/router/paymentRouter");
 
 const api = '/api/v1';
 
+app.use("/", (req, res) => {
+  res.json( {
+    status: "success",
+    message: "Server is running"
+  })
+})
+
 app.use(`${api}/auth`, authRoute);
 app.use(`${api}/users`, userRoute);
 app.use(`${api}/categories`, categoryRoute);
