@@ -1,4 +1,4 @@
-const Category = require("../model/category");
+const Category = require("../model/categoryModel");
 
 const createCategory = async (req, res, next) => {
   const newCategory = new Category(req.body);
@@ -49,6 +49,7 @@ const getCategories = async (req, res, next) => {
     next(err);
   }
 };
+
 
 module.exports = {
   createCategory,

@@ -26,7 +26,7 @@ const updateProduct = async (req, res) => {
     res.send({
       success: false,
       message: err.message,
-    })
+    });
   }
 };
 
@@ -39,7 +39,7 @@ const deleteProduct = async (req, res) => {
       success: true,
       message: "Product deleted successfully",
       data: product,
-    })
+    });
   } catch (err) {
     res.status(500).json(err);
   }
@@ -91,11 +91,68 @@ const getProductById = async (req, res) => {
       success: true,
       message: "Product fetched successfully",
       data: product,
-    })
+    });
   } catch (err) {
     res.status(500).json(err);
   }
 };
+
+const getProductByCategoryId = async (req, res) => {
+  try {
+    const { id } = req.params;
+    validateMongoDbId(id);
+    const products = await Product.find({ categories: { $in: [id] } });
+    res.send({
+      success: true,
+      message: "Products fetched successfully",
+      data: products,
+    });
+  } catch (err) {
+    res.status(500).json(err);
+  }
+};
+
+// check count in stock for each product if count in stock is 0 then update status to false
+const checkProductStock = async (req, res, next) => {
+  try {
+    const products = await Product.find();
+    for (const product of products) {
+      if (product.countInStock === 0) {
+        await Product.findByIdAndUpdate(product._id, {
+          status: "out of stock",
+        });
+      }
+    }
+    next();
+  } catch (err) {
+    next(err);
+  }
+};
+
+// if user by a product is deleting then decrease the count in stock
+
+const decreaseProductStock = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    validateMongoDbId(id);
+    const product = await Product.findById(id);
+    if (product.countInStock > 0) {
+      await Product.findByIdAndUpdate(product._id, {
+        countInStock: product.countInStock - 1,
+      });
+    } else {
+      await Product.findByIdAndUpdate(product._id, {
+        status: "out of stock",
+      });
+    }
+    
+    next();
+  } catch (err) {
+    next(err);
+  }
+};
+
+
 
 module.exports = {
   createProduct,

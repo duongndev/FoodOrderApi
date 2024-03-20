@@ -33,7 +33,7 @@ const UserSchema = new mongoose.Schema(
         city: "",
         postalCode: "",
         country: "",
-      }
+      },
     },
     avatar: {
       type: String,
@@ -43,7 +43,7 @@ const UserSchema = new mongoose.Schema(
     passwordResetToken: String,
     passwordResetExpires: Date,
   },
-  { timestamps: true }
+  { timestamps: true, versionKey: false }
 );
 UserSchema.pre("save", async function (next) {
   if (!this.isModified("password")) {
