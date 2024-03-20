@@ -7,9 +7,16 @@ const getUsers = async (req, res, next) => {
     const users = query
       ? await User.find().sort({ _id: -1 }).limit(5)
       : await User.find();
-    res.status(200).json(users);
+    res.send({
+      status: "success",
+      message: "Users fetched successfully",
+      data: users,
+    })
   } catch (err) {
-    res.status(500).json(err);
+    res.send({
+      status: "failed",
+      message: err.message,
+    })
   }
 };
 
@@ -19,9 +26,16 @@ const getUser = async (req, res, next) => {
     validateMongoDbId(userId);
     const user = await User.findById(userId);
     const { password, ...others } = user._doc;
-    res.status(200).json(others);
+    res.send({
+      status: "success",
+      message: "User fetched successfully",
+      data: others,
+    })
   } catch (err) {
-    res.status(500).json(err);
+    res.send({
+      status: "failed",
+      message: err.message,
+    })
   }
 };
 
@@ -32,18 +46,34 @@ const updateUser = async (req, res, next) => {
     const updatedUser = await User.findByIdAndUpdate(userId, req.body, {
       new: true,
     });
-    res.status(200).json(updatedUser);
-  } catch (err) {}
+    res.send({
+      status: "success",
+      message: "User updated successfully",
+      data: updatedUser,
+    })
+  } catch (err) {
+    res.send({
+      status: "failed",
+      message: err.message,
+    })
+  }
 };
 
 const deleteUser = async (req, res, next) => {
   try {
     const userId = req.params;
     validateMongoDbId(userId);
-    await User.findByIdAndDelete(userId);
-    res.status(200).json("User has been deleted...");
+    const user = await User.findById(userId);
+    res.send({
+      status: "success",
+      message: "User deleted successfully",
+      data: user,
+    })
   } catch (err) {
-    res.status(500).json(err);
+    res.send({
+      status: "failed",
+      message: err.message,
+    })
   }
 };
 
@@ -68,7 +98,10 @@ const getUserStats = async (req, res, next) => {
     ]);
     res.status(200).json(data);
   } catch (err) {
-    res.status(500).json(err);
+    res.send({
+      status: "failed",
+      message: err.message,
+    })
   }
 };
 
