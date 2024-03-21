@@ -7,7 +7,7 @@ const {
 } = require("../config/verifyToken");
 
 // create cart
-router.post("/", verifyToken, cartController.createCart);
+router.post("/", verifyTokenAndAuthorization, cartController.createCart);
 
 // update cart
 router.put("/:id", verifyTokenAndAuthorization, cartController.updateCart);
@@ -19,7 +19,7 @@ router.delete("/:id", verifyTokenAndAuthorization, cartController.deleteCart);
 router.get("/:userId", verifyTokenAndAuthorization, cartController.getUserCart);
 
 // get all carts
-router.get("/", verifyTokenAndAdmin, cartController.getCarts);
+router.get("/", verifyTokenAndAuthorization, cartController.getCarts);
 
 
 module.exports = router;

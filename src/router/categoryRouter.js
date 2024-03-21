@@ -7,13 +7,12 @@ const {
   getCategories,
 } = require("../controller/categoryController");
 const {
-  verifyToken,
   verifyTokenAndAuthorization,
   verifyTokenAndAdmin,
 } = require("../config/verifyToken");
 
 // create category
-router.post("/", verifyTokenAndAdmin, createCategory);
+router.post("/", verifyTokenAndAuthorization, createCategory);
 
 // update category
 router.put("/:id", verifyTokenAndAdmin, updateCategory);

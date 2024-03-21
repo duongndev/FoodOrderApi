@@ -13,6 +13,11 @@ const verifyToken = async (req, res, next) => {
         req.user = user;
         next();
       }
+    } else {
+      res.send({
+        success: false,
+        message: "Not Authorised, Please Login Again"
+      })
     }
   }catch(err){
     res.send({
@@ -24,7 +29,7 @@ const verifyToken = async (req, res, next) => {
 
 const verifyTokenAndAuthorization = (req, res, next) => {
   verifyToken(req, res, () => {
-    if (req.user.id === req.params.id || req.user.isAdmin) {
+    if (req.user.id) {
       next();
     } else {
       res.send({
@@ -48,6 +53,27 @@ const verifyTokenAndAdmin = (req, res, next) => {
   });
 };
 
+
+// verify token user is allowed to
+
+const verifyTokenAndUser = (req, res, next) => {
+  verifyToken(req, res, () => {
+    if (!req.user.isAdmin) {
+      next();
+    } else {
+      res.send({ 
+        success: false,
+        message: req.user
+      })
+    }
+  });
+}
+
+const generateRefreshToken = (id) => {
+  return jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: "7d" });
+}
+
+
 const generateJwtToken = (id) => {
   return jwt.sign({ id }, process.env.JWT_SECRET, {
     expiresIn: "10m",
@@ -59,5 +85,6 @@ module.exports = {
   verifyToken,
   verifyTokenAndAuthorization,
   verifyTokenAndAdmin,
+  verifyTokenAndUser,
   generateJwtToken
 };

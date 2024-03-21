@@ -16,7 +16,7 @@ const {
 router.post("/", verifyTokenAndAdmin, createProduct);
 
 // update product
-router.put("/:id", verifyTokenAndAdmin, updateProduct);
+router.put("/:id", verifyTokenAndAuthorization, updateProduct);
 
 // delete product
 router.delete("/:id", verifyTokenAndAdmin, deleteProduct);
@@ -25,6 +25,6 @@ router.delete("/:id", verifyTokenAndAdmin, deleteProduct);
 router.get("/", verifyTokenAndAuthorization, getProducts);
 
 // get product by id
-router.get("/:id", verifyToken, getProductById);
+router.get("/:id", verifyTokenAndAuthorization, getProductById);
 
 module.exports = router;

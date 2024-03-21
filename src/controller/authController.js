@@ -1,5 +1,5 @@
 const User = require("../model/userModel");
-const bycrypt = require("bcrypt");
+const bcrypt = require("bcrypt");
 const asyncHandler = require("express-async-handler");
 const {
   generateJwtToken,
@@ -10,58 +10,85 @@ const register = asyncHandler(async (req, res) => {
   const { fullName, email, password } = req.body;
   try {
     if (!fullName || !email || !password) {
-      res.status(400).json({ message: "All fields are required" });
+      res.send({
+        success: "failed",
+        message: "All fields are required",
+        data: null,
+      });
       return;
     }
     const existingUser = await User.findOne({ email });
     if (existingUser) {
-      res.status(400).json({ message: "User already exists" });
+      res.send({
+        success: "fail",
+        message: "User already exists",
+      });
       return;
     }
-    const hashedPassword = await bycrypt.hash(password, 10);
+
     const user = await User.create({
       fullName,
       email,
-      password: hashedPassword,
+      password
     });
-    res.status(200).json(user);
+    res.send({
+      success: "success",
+      message: "User created successfully",
+      data: user,
+    });
   } catch (e) {
-    res.status(500).json(e);
+    res.send({
+      success: "failed",
+      message: e.message,
+    });
   }
 });
 
 const login = asyncHandler(async (req, res) => {
   const { email, password } = req.body;
 
-  if (!email || !password) {
-    return res.json({ message: "All fields are required" });
-  }
-
   try {
+    if (!email || !password) {
+      return res.send({
+        success: "fail",
+        message: "All fields are required",
+        token: null,
+      });
+    }
+
     const user = await User.findOne({ email });
 
     if (!user) {
-      return res.json({ message: "User does not exist" });
+      return res.send({
+        success: "fail",
+        message: "Invalid credentials",
+        token: null,
+      });
     }
+    
+    const userPassword = user.password;
+    console.log(userPassword);
 
-    const isPasswordCorrect = await bycrypt.compare(password, user.password);
+    const passwordMatch = await bcrypt.compare(password, userPassword);
 
-    if (isPasswordCorrect) {
-      return res.json({ message: "Invalid credentials" });
+    if (!passwordMatch) {
+      return res.send({
+        success: "fail",
+        message: "Invalid credentials",
+        token: null,
+      });
     }
-
     const token = generateJwtToken(user._id);
-
-    const { password: _, ...userInfo } = user._doc;
-
+    
     res.send({
-      susccess: true,
+      success: "success",
       message: "Login successful",
-      token: token
+      token: token,
     });
+
   } catch (error) {
     res.send({
-      success: false,
+      success: "fail",
       message: "Something went wrong",
       error: error.message,
     });
