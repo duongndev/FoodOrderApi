@@ -13,7 +13,6 @@ const register = asyncHandler(async (req, res) => {
       res.send({
         success: "failed",
         message: "All fields are required",
-        data: null,
       });
       return;
     }
@@ -52,7 +51,6 @@ const login = asyncHandler(async (req, res) => {
       return res.send({
         success: "fail",
         message: "All fields are required",
-        token: null,
       });
     }
 
@@ -62,20 +60,15 @@ const login = asyncHandler(async (req, res) => {
       return res.send({
         success: "fail",
         message: "Invalid credentials",
-        token: null,
       });
     }
     
-    const userPassword = user.password;
-    console.log(userPassword);
-
-    const passwordMatch = await bcrypt.compare(password, userPassword);
+    const passwordMatch = await bcrypt.compare(password, user.password);
 
     if (!passwordMatch) {
       return res.send({
         success: "fail",
         message: "Invalid credentials",
-        token: null,
       });
     }
     const token = generateJwtToken(user._id);
@@ -89,8 +82,7 @@ const login = asyncHandler(async (req, res) => {
   } catch (error) {
     res.send({
       success: "fail",
-      message: "Something went wrong",
-      error: error.message,
+      message: error,
     });
   }
 });
